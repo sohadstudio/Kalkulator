@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sohad Studio — Kalkulator Percetakan</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Font Awesome 6 Free -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- PDF.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        studio: {
+                            bg: '#F8FAFC',
+                            card: '#FFFFFF',
+                            border: '#E2E8F0',
+                            input: '#F1F5F9',
+                            dark: '#141414',
+                            darkHover: '#262626',
+                            muted: '#64748B'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Tambahkan baris ini agar background Blogger ikut menyesuaikan */
+        html, body, .post-body {
+            background-color: #f4f4f4 !important;
+        }
+      
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+        *:not(.fa-solid):not(.fa-regular):not(.fa-brands):not(.fas):not(.far):not(.fab):not([class*="fa-"]),
+        body, button, input, select, textarea, table, th, td {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+        }
+
+        /* Crisp & aligned Font Awesome rendering */
+        .fa-solid, .fa-regular, .fa-brands {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            vertical-align: middle;
+        }
+
+        body {
+            background-color: #F8FAFC;
+            color: #141414;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom subtle scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+
+        /* Hide number input arrows for cleaner look */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* Custom Select Arrow */
+        select.custom-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23141414' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.75' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.85rem center;
+            background-repeat: no-repeat;
+            background-size: 1.15em 1.15em;
+        }
+
+        /* Smooth modal animation */
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.96) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-modal {
+            animation: modalFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Hidden Canvas for Pixel & Ink Analysis -->
+    <canvas id="analysisCanvas" class="hidden"></canvas>
+
+    <!-- NAVBAR / HEADER -->
+    <header class="bg-white border-b border-slate-200/80 sticky top-0 z-30">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 sm:h-[72px] flex items-center justify-between gap-3">
+            <!-- Left Brand -->
+            <div class="flex items-center gap-3">
+                <!-- Link untuk Gambar Desktop (Buka di Tab Baru) -->
+                <a href="https://www.sohad.my.id" target="_blank" rel="noopener noreferrer" class="hidden md:block">
+                    <img alt="Sohad Studio Desktop" class="h-10 w-auto object-contain" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgPRuU_SNMh5Lc93GxCE202OTAZmtnLe-JiKMePClSILo4MeWnh-syhTxfUWw-XdpoHjf8jqit0ewnPLhyprCFr7bKh5FIyhExsGDT9ZjC1YiVmHyNtM__iVwCXOrr0WfzfUbrHLiLp4o6STDZDm3GBlSrnSG8Jz2d7VHwUpGNotNpvqphYH9i9l5W9dTA/s3076/Sub%20Logo%20Sohad%20Studio%201%20%28Hitam%29.png" />
+                </a>
+
+                <!-- Link untuk Gambar Mobile (Buka di Tab Baru) -->
+                <a href="https://www.sohad.my.id" target="_blank" rel="noopener noreferrer" class="block md:hidden">
+                    <img alt="Sohad Studio Mobile" class="h-9 w-auto object-contain" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhu42WQLGAfywgOKH1Rt9OaO2eFduExgBPBMnAkvHN4AUAKOihYuNTlTwa-XJZ8_XEJo4dGVGXTv8EL38AE2HW9I5X5bX6OXXJHupej016-sTTC83fCBFwULIcC_SOhrUhUKEYs1Ahz6J2KqS5n7G8X6TEtBMBD1Ld7xhZ3Jp9zK1lvE2o6oeDV3FR8uiE/s2406/Sub%20Logo%20Sohad%20Studio%202%20%28Hitam%29.png" />
+                </a>
+
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <span class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-md border border-slate-200/60">
+                        Kalkulator Percetakan
+                    </span>
+                </div>
+            </div>
+
+            <!-- Right Action Button (Hitung Rincian dengan warna #141414) -->
+            <button id="btnOpenResult" onclick="calculateAndShowModal()" class="inline-flex items-center justify-center gap-2 bg-[#141414] hover:bg-[#262626] active:scale-[0.99] text-white text-xs sm:text-sm font-semibold px-4 sm:px-5 py-2.5 rounded-xl shadow-sm transition-all cursor-pointer shrink-0">
+                <i class="fa-solid fa-calculator fa-fw"></i>
+                <span>Hitung Rincian</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+            
+            <!-- ==================== KOLOM KIRI (6 cols on lg) ==================== -->
+            <div class="lg:col-span-6 space-y-5 sm:space-y-6">
+                
+                <!-- KARTU 1: FILE & JUMLAH HALAMAN -->
+                <section class="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                    <!-- Card Header -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="inline-flex items-center gap-2.5 text-[#141414]">
+                            <span class="w-5 h-5 inline-flex items-center justify-center text-[#141414]">
+                                <i class="fa-solid fa-file-circle-plus fa-fw text-[15px]"></i>
+                            </span>
+                            <h2 class="text-xs sm:text-[13px] font-bold tracking-wider uppercase text-[#141414] leading-none">FILE &amp; JUMLAH HALAMAN</h2>
+                        </div>
+                        <span class="text-[11px] font-medium text-slate-400 tracking-wide">PDF, JPG, PNG</span>
+                    </div>
+
+                    <!-- Dropzone Area -->
+                    <div id="dropZone" class="relative border-2 border-dashed border-slate-200 hover:border-[#141414]/40 bg-slate-50/40 hover:bg-slate-50/90 rounded-xl p-6 text-center transition-all cursor-pointer group">
+                        <input type="file" id="fileInput" accept=".pdf,image/jpeg,image/png,image/webp" class="hidden">
+                        
+                        <!-- Default Empty Upload State -->
+                        <div id="uploadPlaceholder" class="flex flex-col items-center justify-center py-1">
+                            <div class="w-11 h-11 rounded-xl bg-slate-100 group-hover:bg-white group-hover:shadow-sm border border-slate-200/60 inline-flex items-center justify-center text-[#141414] mb-3 transition-all">
+                                <i class="fa-solid fa-cloud-arrow-up fa-fw text-lg text-[#141414]"></i>
+                            </div>
+                            <p class="text-sm font-bold text-[#141414] mb-1">Unggah berkas PDF atau Gambar</p>
+                            <p class="text-xs text-slate-400">Tarik &amp; lepas file di sini atau klik untuk memilih</p>
+                        </div>
+
+                        <!-- Loading / Analyzing State -->
+                        <div id="uploadAnalyzing" class="hidden flex-col items-center justify-center py-3">
+                            <div class="w-8 h-8 border-2 border-[#141414] border-t-transparent rounded-full animate-spin mb-2.5"></div>
+                            <p class="text-xs font-semibold text-[#141414]" id="analyzingText">Menganalisis cakupan tinta piksel...</p>
+                        </div>
+
+                        <!-- Uploaded File Preview & Coverage Info -->
+                        <div id="uploadPreview" class="hidden text-left">
+                            <div class="flex items-center gap-3.5 bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+                                <div class="w-12 h-14 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0 inline-flex items-center justify-center">
+                                    <img id="previewThumb" src="" alt="Preview" class="w-full h-full object-cover hidden">
+                                    <i id="previewPdfIcon" class="fa-solid fa-file-pdf fa-fw text-xl text-[#141414]"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <p id="fileName" class="text-xs font-bold text-[#141414] truncate">dokumen.pdf</p>
+                                        <button type="button" id="btnRemoveFile" class="w-7 h-7 inline-flex items-center justify-center text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors shrink-0" title="Hapus file">
+                                            <i class="fa-solid fa-xmark fa-fw text-xs"></i>
+                                        </button>
+                                    </div>
+                                    <p id="fileMeta" class="text-[11px] text-slate-500 mt-0.5">Terdeteksi 1 halaman • Analisis piksel selesai</p>
+                                    
+                                    <!-- Coverage Pills -->
+                                    <div class="flex flex-wrap items-center gap-1.5 mt-2">
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-pink-50 text-pink-700 border border-pink-200/70">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-gradient-to-tr from-cyan-500 via-pink-500 to-amber-400"></span>
+                                            CMY: <strong id="badgeCmyCov">0.0%</strong>
+                                        </span>
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-[#141414] border border-slate-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-[#141414]"></span>
+                                            Black: <strong id="badgeBlackCov">0.0%</strong>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estimasi Mode Info (when no file uploaded) -->
+                    <div id="defaultCoverageNote" class="mt-2.5 flex items-center justify-between text-[11px] text-slate-400 px-0.5">
+                        <span>Mode estimasi standar (tanpa file):</span>
+                        <span class="font-medium text-slate-500">CMY 5.0% • Black 5.0%</span>
+                    </div>
+
+                    <!-- Inputs: Jumlah Halaman & Jumlah Cetak -->
+                    <div class="grid grid-cols-2 gap-3.5 mt-4">
+                        <div>
+                            <label for="inputPages" class="block text-xs font-semibold text-slate-600 mb-1.5">Jumlah Halaman</label>
+                            <input type="number" id="inputPages" value="1" min="1" class="w-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-[#141414] rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#141414] outline-none transition-all">
+                        </div>
+                        <div>
+                            <label for="inputCopies" class="block text-xs font-semibold text-slate-600 mb-1.5">Jumlah Cetak (Copy)</label>
+                            <input type="number" id="inputCopies" value="1" min="1" class="w-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-[#141414] rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#141414] outline-none transition-all">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- KARTU 2: PENGATURAN CETAK -->
+                <section class="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                    <!-- Card Header -->
+                    <div class="inline-flex items-center gap-2.5 text-[#141414] mb-4">
+                        <span class="w-5 h-5 inline-flex items-center justify-center text-[#141414]">
+                            <i class="fa-solid fa-sliders fa-fw text-[14px]"></i>
+                        </span>
+                        <h2 class="text-xs sm:text-[13px] font-bold tracking-wider uppercase text-[#141414] leading-none">PENGATURAN CETAK</h2>
+                    </div>
+
+                    <!-- Pilih Printer -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Pilih Printer</label>
+                        <div class="grid grid-cols-2 gap-2.5" id="printerCards">
+                            
+                            <!-- Printer 1: Canon G1010 (Default Active) -->
+                            <button type="button" data-printer="canon-g1010" class="printer-card active text-left p-3 rounded-xl border-2 border-[#141414] bg-white transition-colors relative cursor-pointer">
+                                <span class="check-icon absolute top-3 right-3 w-4 h-4 rounded-full bg-[#141414] text-white inline-flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-check fa-fw text-[9px]"></i>
+                                </span>
+                                <div class="h-6 mb-2 flex items-center pr-6">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Canon_logo.svg" alt="Canon" class="h-3.5 w-auto object-contain">
+                                </div>
+                                <span class="block text-xs font-bold text-[#141414] leading-tight mb-0.5">Canon G1010</span>
+                                <p class="text-[11px] font-medium text-slate-500">Tinta GI-790</p>
+                                <p class="text-[10px] text-slate-400 mt-0.5 leading-tight">(B) Pigment (CMY) Dye</p>
+                            </button>
+
+                            <!-- Printer 2: Epson L121 -->
+                            <button type="button" data-printer="epson-l121" class="printer-card text-left p-3 rounded-xl border-2 border-slate-200 hover:border-slate-300 bg-white transition-colors relative cursor-pointer">
+                                <span class="check-icon absolute top-3 right-3 w-4 h-4 rounded-full bg-slate-200 text-white inline-flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-check fa-fw text-[9px]"></i>
+                                </span>
+                                <div class="h-6 mb-2 flex items-center pr-6">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Epson_logo.svg" alt="Epson" class="h-3.5 w-auto object-contain">
+                                </div>
+                                <span class="block text-xs font-bold text-[#141414] leading-tight mb-0.5">Epson L121</span>
+                                <p class="text-[11px] font-medium text-slate-400">Tinta 664</p>
+                                <p class="text-[10px] text-slate-400 mt-0.5 leading-tight">Full Art Paper</p>
+                            </button>
+
+                            <!-- Printer 3: Epson L3110 (Full Dye) -->
+                            <button type="button" data-printer="epson-l3110" class="printer-card text-left p-3 rounded-xl border-2 border-slate-200 hover:border-slate-300 bg-white transition-colors relative cursor-pointer">
+                                <span class="check-icon absolute top-3 right-3 w-4 h-4 rounded-full bg-slate-200 text-white inline-flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-check fa-fw text-[9px]"></i>
+                                </span>
+                                <div class="h-6 mb-2 flex items-center pr-6">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Epson_logo.svg" alt="Epson" class="h-3.5 w-auto object-contain">
+                                </div>
+                                <span class="block text-xs font-bold text-[#141414] leading-tight mb-0.5">Epson L3110</span>
+                                <p class="text-[11px] font-medium text-slate-400">Tinta 003</p>
+                                <p class="text-[10px] text-slate-400 mt-0.5 leading-tight">Full Dye</p>
+                            </button>
+
+                            <!-- Printer 4: Epson L3210 (Full Pigment) -->
+                            <button type="button" data-printer="epson-l3210" class="printer-card text-left p-3 rounded-xl border-2 border-slate-200 hover:border-slate-300 bg-white transition-colors relative cursor-pointer">
+                                <span class="check-icon absolute top-3 right-3 w-4 h-4 rounded-full bg-slate-200 text-white inline-flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-check fa-fw text-[9px]"></i>
+                                </span>
+                                <div class="h-6 mb-2 flex items-center pr-6">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Epson_logo.svg" alt="Epson" class="h-3.5 w-auto object-contain">
+                                </div>
+                                <span class="block text-xs font-bold text-[#141414] leading-tight mb-0.5">Epson L3210</span>
+                                <p class="text-[11px] font-medium text-slate-400">Tinta 003</p>
+                                <p class="text-[10px] text-slate-400 mt-0.5 leading-tight">Full Pigment</p>
+                            </button>
+
+                        </div>
+                    </div>
+
+                    <!-- Grid 2x2 Dropdowns -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <!-- Ukuran Kertas -->
+                        <div>
+                            <label for="selectPaperSize" class="block text-xs font-semibold text-slate-600 mb-1.5">Ukuran Kertas</label>
+                            <select id="selectPaperSize" class="custom-select w-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-[#141414] rounded-xl pl-3.5 pr-9 py-2.5 text-xs sm:text-[13px] font-semibold text-[#141414] outline-none transition-all cursor-pointer">
+                                <option value="A4" selected>A4 (21,0 x 29,7 cm)</option>
+                                <option value="F4">F4 / Folio (21,5 x 33,0 cm)</option>
+                                <option value="A3">A3 (29,7 x 42,0 cm)</option>
+                                <option value="A5">A5 (14,8 x 21,0 cm)</option>
+                            </select>
+                        </div>
+
+                        <!-- Kualitas Cetak -->
+                        <div>
+                            <label for="selectQuality" class="block text-xs font-semibold text-slate-600 mb-1.5">Kualitas Cetak</label>
+                            <select id="selectQuality" class="custom-select w-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-[#141414] rounded-xl pl-3.5 pr-9 py-2.5 text-xs sm:text-[13px] font-semibold text-[#141414] outline-none transition-all cursor-pointer">
+                                <option value="draft">Draft / Cepat (Hemat Tinta)</option>
+                                <option value="standard" selected>Standard (Dokumen Teks &amp; Gambar)</option>
+                                <option value="high">High / Foto (Tinta Pekat)</option>
+                            </select>
+                        </div>
+
+                        <!-- Sisi Cetak -->
+                        <div>
+                            <label for="selectDuplex" class="block text-xs font-semibold text-slate-600 mb-1.5">Sisi Cetak</label>
+                            <select id="selectDuplex" class="custom-select w-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-[#141414] rounded-xl pl-3.5 pr-9 py-2.5 text-xs sm:text-[13px] font-semibold text-[#141414] outline-none transition-all cursor-pointer">
+                                <option value="single" selected>Satu Muka (1 Sisi)</option>
+                                <option value="duplex">Bolak-Balik (2 Sisi / Duplex)</option>
+                            </select>
+                        </div>
+
+                        <!-- Margin / Border -->
+                        <div>
+                            <label for="selectBorder" class="block text-xs font-semibold text-slate-600 mb-1.5">Margin / Border</label>
+                            <select id="selectBorder" class="custom-select w-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-[#141414] rounded-xl pl-3.5 pr-9 py-2.5 text-xs sm:text-[13px] font-semibold text-[#141414] outline-none transition-all cursor-pointer">
+                                <option value="standard" selected>Standard (Ada Margin)</option>
+                                <option value="borderless">Borderless (Penuh Tanpa Tepi)</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ==================== KOLOM KANAN (6 cols on lg) ==================== -->
+            <div class="lg:col-span-6 space-y-5 sm:space-y-6">
+                
+                <!-- KARTU 3: MODAL TINTA -->
+                <section class="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                    <!-- Card Header -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="inline-flex items-center gap-2.5 text-[#141414]">
+                            <span class="w-5 h-5 inline-flex items-center justify-center text-[#141414]">
+                                <i class="fa-solid fa-droplet fa-fw text-[14px]"></i>
+                            </span>
+                            <h2 class="text-xs sm:text-[13px] font-bold tracking-wider uppercase text-[#141414] leading-none">MODAL TINTA</h2>
+                        </div>
+                        <button type="button" id="btnResetInk" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#141414] transition-colors cursor-pointer">
+                            <i class="fa-solid fa-rotate-left fa-fw text-[11px]"></i>
+                            <span>Reset Default</span>
+                        </button>
+                    </div>
+
+                    <!-- Two Sub-Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <!-- Sub-Card Tinta CMY -->
+                        <div class="rounded-xl border border-slate-200/80 p-3.5 bg-white">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-tr from-cyan-400 via-pink-500 to-amber-300 shrink-0"></span>
+                                <span class="text-xs font-bold text-[#141414]">Tinta CMY</span>
+                            </div>
+                            <div class="space-y-2.5">
+                                <div>
+                                    <label for="cmyPrice" class="block text-[11px] font-medium text-slate-400 mb-1">Harga 1 Botol (Rp)</label>
+                                    <input type="number" id="cmyPrice" value="17500" min="0" step="500" class="w-full bg-white border border-slate-200 focus:border-[#141414] rounded-lg px-3 py-2 text-xs sm:text-sm font-bold text-[#141414] outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label for="cmyVolume" class="block text-[11px] font-medium text-slate-400 mb-1">Volume (ml)</label>
+                                    <input type="number" id="cmyVolume" value="70" min="1" class="w-full bg-white border border-slate-200 focus:border-[#141414] rounded-lg px-3 py-2 text-xs sm:text-sm font-bold text-[#141414] outline-none transition-all">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub-Card Tinta Black -->
+                        <div class="rounded-xl border border-slate-200/80 p-3.5 bg-white">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#141414] shrink-0"></span>
+                                <span class="text-xs font-bold text-[#141414]">Tinta Black</span>
+                            </div>
+                            <div class="space-y-2.5">
+                                <div>
+                                    <label for="blackPrice" class="block text-[11px] font-medium text-slate-400 mb-1">Harga 1 Botol (Rp)</label>
+                                    <input type="number" id="blackPrice" value="65000" min="0" step="500" class="w-full bg-white border border-slate-200 focus:border-[#141414] rounded-lg px-3 py-2 text-xs sm:text-sm font-bold text-[#141414] outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label for="blackVolume" class="block text-[11px] font-medium text-slate-400 mb-1">Volume (ml)</label>
+                                    <input type="number" id="blackVolume" value="135" min="1" class="w-full bg-white border border-slate-200 focus:border-[#141414] rounded-lg px-3 py-2 text-xs sm:text-sm font-bold text-[#141414] outline-none transition-all">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- KARTU 4: HITUNG BIAYA KERTAS (Collapsible Toggle Card) -->
+                <section class="bg-white rounded-2xl border border-slate-200/90 p-5 sm:px-6 sm:py-4.5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-all">
+                    <label for="togglePaperCost" class="flex items-center justify-between cursor-pointer select-none py-0.5">
+                        <div class="inline-flex items-center gap-3">
+                            <input type="checkbox" id="togglePaperCost" class="w-4 h-4 rounded border-slate-300 text-[#141414] focus:ring-[#141414] accent-[#141414] cursor-pointer shrink-0">
+                            <div class="inline-flex items-center gap-2.5 text-[#141414]">
+                                <span class="w-5 h-5 inline-flex items-center justify-center text-[#141414]">
+                                    <i class="fa-solid fa-layer-group fa-fw text-[14px]"></i>
+                                </span>
+                                <span class="text-xs sm:text-[13px] font-bold tracking-wider uppercase text-[#141414] leading-none">HITUNG BIAYA KERTAS</span>
+                            </div>
+                        </div>
+                        <span id="paperCostSummaryBadge" class="hidden text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                            Rp 110 / lbr
+                        </span>
+                    </label>
+
+                    <!-- Collapsible Form Content -->
+                    <div id="paperCostForm" class="hidden mt-4 pt-4 border-t border-slate-100 space-y-3">
+                        <div>
+                            <label for="selectPaperType" class="block text-xs font-semibold text-slate-600 mb-1.5">Jenis Kertas</label>
+                            <select id="selectPaperType" class="custom-select w-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-[#141414] rounded-xl pl-3.5 pr-9 py-2.5 text-xs sm:text-[13px] font-semibold text-[#141414] outline-none transition-all cursor-pointer">
+                                <option value="hvs70" data-price="48000" data-qty="500">HVS 70gsm (Standar Fotokopi/Dokumen)</option>
+                                <option value="hvs80" data-price="55000" data-qty="500" selected>HVS 80gsm (Dokumen Premium)</option>
+                                <option value="artpaper120" data-price="45000" data-qty="100">Art Paper 120gsm (Brosur/Flyer)</option>
+                                <option value="artcarton260" data-price="65000" data-qty="100">Art Carton 260gsm (Kartu Nama/Cover)</option>
+                                <option value="glossy" data-price="35000" data-qty="20">Glossy Photo Paper (Cetak Foto)</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3.5">
+                            <div>
+                                <label for="paperPackPrice" class="block text-xs font-semibold text-slate-600 mb-1.5">Harga 1 Rim / Pack (Rp)</label>
+                                <input type="number" id="paperPackPrice" value="55000" min="0" step="500" class="w-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-[#141414] rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#141414] outline-none transition-all">
+                            </div>
+                            <div>
+                                <label for="paperPackQty" class="block text-xs font-semibold text-slate-600 mb-1.5">Isi per Rim / Pack (lbr)</label>
+                                <input type="number" id="paperPackQty" value="500" min="1" class="w-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-[#141414] rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#141414] outline-none transition-all">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- KARTU 5: MARGIN KEUNTUNGAN & JASA -->
+                <section class="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                    <!-- Card Header -->
+                    <div class="inline-flex items-center gap-2.5 text-[#141414] mb-4">
+                        <span class="w-5 h-5 inline-flex items-center justify-center text-[#141414]">
+                            <i class="fa-solid fa-arrow-trend-up fa-fw text-[14px]"></i>
+                        </span>
+                        <h2 class="text-xs sm:text-[13px] font-bold tracking-wider uppercase text-[#141414] leading-none">MARGIN KEUNTUNGAN &amp; JASA</h2>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3.5">
+                        <div>
+                            <label for="inputMarkup" class="block text-xs font-semibold text-slate-600 mb-1.5">Markup Profit (%)</label>
+                            <input type="number" id="inputMarkup" value="75" min="0" class="w-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-[#141414] rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#141414] outline-none transition-all">
+                        </div>
+                        <div>
+                            <label for="inputServiceFee" class="block text-xs font-semibold text-slate-600 mb-1.5">Biaya Jasa</label>
+                            <input type="number" id="inputServiceFee" value="0" min="0" step="500" class="w-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-[#141414] rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#141414] outline-none transition-all">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- LIVE QUICK PREVIEW BAR (Tampilan statis di tengah) -->
+<div class="bg-[#141414] text-white rounded-2xl p-4 sm:px-6 flex items-center justify-center text-center shadow-sm">
+    <div>
+        <p class="text-[11px] font-medium text-neutral-400">Estimasi Total Harga Jual</p>
+        <p id="liveTotalDisplay" class="text-2xl sm:text-3xl font-black tracking-tight mt-0.5">Rp 150</p>
+    </div>
+</div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-200 mt-12 py-6 text-center text-xs text-gray-500">
+        <p>© 2026 Sohad Studio. All Rights Reserved.</p>
+    </footer>
+
+    <!-- ==================== MODAL RINCIAN PERHITUNGAN ==================== -->
+    <div id="resultModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-[#141414]/50 backdrop-blur-xs">
+        <div class="bg-white w-full max-w-lg rounded-2xl border border-slate-200 shadow-2xl overflow-hidden animate-modal max-h-[92vh] flex flex-col">
+            
+            <!-- Modal Header -->
+            <div class="px-5 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-[#141414] text-white inline-flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-receipt fa-fw text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-[#141414]">Rincian Biaya Cetak</h3>
+                        <p id="modalSubtitle" class="text-[11px] text-slate-500">Canon G1010 • A4 • Standard</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-[#141414] hover:bg-slate-200/60 inline-flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fa-solid fa-xmark fa-fw text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-5 sm:p-6 overflow-y-auto space-y-4 text-xs sm:text-sm">
+                
+                <!-- 1. Analisis Tinta & Volume -->
+                <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200/70 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Analisis Cakupan &amp; Konsumsi Tinta</span>
+                        <span id="modalSourceTag" class="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-200/80 text-slate-700">Estimasi Standar</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2.5 pt-1">
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200/60">
+                            <div class="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
+                                <span class="w-2 h-2 rounded-full bg-gradient-to-tr from-cyan-400 via-pink-500 to-amber-300"></span>
+                                <span>Tinta CMY</span>
+                            </div>
+                            <p class="text-xs sm:text-sm font-bold text-[#141414] mt-1">
+                                <span id="resCmyCov">5.0%</span>
+                                <span class="text-[11px] font-normal text-slate-400">(<span id="resCmyMl">0.015</span> ml)</span>
+                            </p>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200/60">
+                            <div class="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
+                                <span class="w-2 h-2 rounded-full bg-[#141414]"></span>
+                                <span>Tinta Black</span>
+                            </div>
+                            <p class="text-xs sm:text-sm font-bold text-[#141414] mt-1">
+                                <span id="resBlackCov">5.0%</span>
+                                <span class="text-[11px] font-normal text-slate-400">(<span id="resBlackMl">0.015</span> ml)</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Rincian Modal Produksi (HPP) -->
+                <div class="space-y-2.5">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Rincian Modal Produksi (HPP)</p>
+                    
+                    <div class="flex items-center justify-between text-slate-600">
+                        <span>Modal Tinta CMY</span>
+                        <span id="resCostCmy" class="font-semibold text-[#141414]">Rp 0</span>
+                    </div>
+                    <div class="flex items-center justify-between text-slate-600">
+                        <span>Modal Tinta Black</span>
+                        <span id="resCostBlack" class="font-semibold text-[#141414]">Rp 0</span>
+                    </div>
+                    <div id="resPaperRow" class="hidden flex items-center justify-between text-slate-600">
+                        <span id="resPaperLabel">Biaya Kertas (1 lembar)</span>
+                        <span id="resCostPaper" class="font-semibold text-[#141414]">Rp 0</span>
+                    </div>
+
+                    <div class="pt-2 border-t border-dashed border-slate-200 flex items-center justify-between font-bold text-[#141414]">
+                        <span>Total Modal Produksi (HPP)</span>
+                        <span id="resTotalHpp">Rp 0</span>
+                    </div>
+                </div>
+
+                <!-- 3. Margin & Jasa -->
+                <div class="space-y-2 pt-2 border-t border-slate-100">
+                    <div class="flex items-center justify-between text-slate-600">
+                        <span>Margin Keuntungan (<span id="resMarkupPct">75</span>%)</span>
+                        <span id="resProfitAmount" class="font-semibold text-emerald-600">+ Rp 0</span>
+                    </div>
+                    <div class="flex items-center justify-between text-slate-600">
+                        <span>Biaya Jasa / Tambahan</span>
+                        <span id="resServiceFee" class="font-semibold text-[#141414]">Rp 0</span>
+                    </div>
+                </div>
+
+                <!-- 4. Highlight Total Harga Jual -->
+                <div class="bg-[#141414] text-white rounded-xl p-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-neutral-300 font-medium">Total Harga Jual (<span id="resTotalPages">1</span> hal)</span>
+                        <span id="resGrandTotal" class="text-xl sm:text-2xl font-extrabold tracking-tight">Rp 0</span>
+                    </div>
+                    <div class="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-neutral-300">
+                        <span>Harga Jual per Halaman</span>
+                        <span id="resPricePerPage" class="font-bold text-white">Rp 0 / hal</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 bg-[#141414] text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg inline-flex items-center gap-2.5 translate-y-16 opacity-0 transition-all duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check fa-fw text-sm text-emerald-400"></i>
+        <span id="toastMessage" class="leading-none">Rincian berhasil disalin!</span>
+    </div>
+
+    <script>
+        // ==================== APPLICATION STATE ====================
+        const state = {
+            hasFile: false,
+            fileName: '',
+            cmyCoverage: 5.0,
+            blackCoverage: 5.0,
+            printer: 'canon-g1010',
+            lastCalculation: null
+        };
+
+        // Printer Preset Configurations
+        const printerPresets = {
+            'canon-g1010': {
+                name: 'Canon G1010',
+                cmyPrice: 17500,
+                cmyVolume: 70,
+                blackPrice: 65000,
+                blackVolume: 135
+            },
+            'epson-l121': {
+                name: 'Epson L121',
+                cmyPrice: 85000,
+                cmyVolume: 70,
+                blackPrice: 85000,
+                blackVolume: 70
+            },
+            'epson-l3110': {
+                name: 'Epson L3110',
+                cmyPrice: 85000,
+                cmyVolume: 65,
+                blackPrice: 85000,
+                blackVolume: 65
+            },
+            'epson-l3210': {
+                name: 'Epson L3210',
+                cmyPrice: 95000,
+                cmyVolume: 65,
+                blackPrice: 95000,
+                blackVolume: 65
+            }
+        };
+
+        // Paper Area Multipliers relative to A4 (21.0 x 29.7 cm)
+        const paperAreaMultipliers = {
+            'A4': 1.0,
+            'F4': 1.14,
+            'A3': 2.0,
+            'A5': 0.5
+        };
+
+        // Print Quality Multipliers (ml consumption factor)
+        const qualityMultipliers = {
+            'draft': 0.65,
+            'standard': 1.0,
+            'high': 1.65
+        };
+
+        // ==================== DOM ELEMENTS ====================
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+        const uploadAnalyzing = document.getElementById('uploadAnalyzing');
+        const analyzingText = document.getElementById('analyzingText');
+        const uploadPreview = document.getElementById('uploadPreview');
+        const previewThumb = document.getElementById('previewThumb');
+        const previewPdfIcon = document.getElementById('previewPdfIcon');
+        const fileNameEl = document.getElementById('fileName');
+        const fileMetaEl = document.getElementById('fileMeta');
+        const badgeCmyCov = document.getElementById('badgeCmyCov');
+        const badgeBlackCov = document.getElementById('badgeBlackCov');
+        const defaultCoverageNote = document.getElementById('defaultCoverageNote');
+        const btnRemoveFile = document.getElementById('btnRemoveFile');
+
+        const inputPages = document.getElementById('inputPages');
+        const inputCopies = document.getElementById('inputCopies');
+        const printerCards = document.querySelectorAll('.printer-card');
+        const selectPaperSize = document.getElementById('selectPaperSize');
+        const selectQuality = document.getElementById('selectQuality');
+        const selectDuplex = document.getElementById('selectDuplex');
+        const selectBorder = document.getElementById('selectBorder');
+
+        const cmyPriceInput = document.getElementById('cmyPrice');
+        const cmyVolumeInput = document.getElementById('cmyVolume');
+        const blackPriceInput = document.getElementById('blackPrice');
+        const blackVolumeInput = document.getElementById('blackVolume');
+        const btnResetInk = document.getElementById('btnResetInk');
+
+        const togglePaperCost = document.getElementById('togglePaperCost');
+        const paperCostForm = document.getElementById('paperCostForm');
+        const paperCostSummaryBadge = document.getElementById('paperCostSummaryBadge');
+        const selectPaperType = document.getElementById('selectPaperType');
+        const paperPackPrice = document.getElementById('paperPackPrice');
+        const paperPackQty = document.getElementById('paperPackQty');
+
+        const inputMarkup = document.getElementById('inputMarkup');
+        const inputServiceFee = document.getElementById('inputServiceFee');
+        const liveTotalDisplay = document.getElementById('liveTotalDisplay');
+
+        // ==================== FORMATTERS ====================
+        function formatRupiah(amount) {
+            return 'Rp ' + Math.round(amount).toLocaleString('id-ID');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastMessage').textContent = msg;
+            toast.classList.remove('translate-y-16', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-16', 'opacity-0');
+            }, 2600);
+        }
+
+        // ==================== REAL PIXEL / CMYK COVERAGE ANALYZER ====================
+        function analyzeCanvasPixels(canvas) {
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            const width = canvas.width;
+            const height = canvas.height;
+            const imgData = ctx.getImageData(0, 0, width, height).data;
+            const totalPixels = width * height;
+
+            let totalC = 0, totalM = 0, totalY = 0, totalK = 0;
+
+            for (let i = 0; i < imgData.length; i += 4) {
+                const alpha = imgData[i + 3] / 255;
+                const r = (imgData[i] * alpha + 255 * (1 - alpha)) / 255;
+                const g = (imgData[i + 1] * alpha + 255 * (1 - alpha)) / 255;
+                const b = (imgData[i + 2] * alpha + 255 * (1 - alpha)) / 255;
+
+                const k = 1 - Math.max(r, g, b);
+
+                if (k < 0.999) {
+                    const c = (1 - r - k) / (1 - k);
+                    const m = (1 - g - k) / (1 - k);
+                    const y = (1 - b - k) / (1 - k);
+
+                    totalC += Math.max(0, c);
+                    totalM += Math.max(0, m);
+                    totalY += Math.max(0, y);
+                }
+                totalK += Math.max(0, k);
+            }
+
+            const avgC = (totalC / totalPixels) * 100;
+            const avgM = (totalM / totalPixels) * 100;
+            const avgY = (totalY / totalPixels) * 100;
+            const cmyPct = (avgC + avgM + avgY) / 3;
+            const blackPct = (totalK / totalPixels) * 100;
+
+            return {
+                cmy: Math.min(100, Math.max(0, cmyPct)),
+                black: Math.min(100, Math.max(0, blackPct))
+            };
+        }
+
+        async function processUploadedFile(file) {
+            if (!file) return;
+
+            const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+            const isImage = file.type.startsWith('image/');
+
+            if (!isPdf && !isImage) {
+                showToast('Format file tidak didukung. Gunakan PDF, JPG, atau PNG.');
+                return;
+            }
+
+            uploadPlaceholder.classList.add('hidden');
+            uploadPreview.classList.add('hidden');
+            uploadAnalyzing.classList.remove('hidden');
+            uploadAnalyzing.classList.add('flex');
+
+            const canvas = document.getElementById('analysisCanvas');
+            const ctx = canvas.getContext('2d');
+
+            try {
+                if (isImage) {
+                    analyzingText.textContent = 'Menganalisis piksel gambar...';
+                    const dataUrl = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = e => resolve(e.target.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+
+                    const img = await new Promise((resolve, reject) => {
+                        const image = new Image();
+                        image.onload = () => resolve(image);
+                        image.onerror = reject;
+                        image.src = dataUrl;
+                    });
+
+                    const maxDim = 450;
+                    const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+                    canvas.width = Math.max(1, Math.floor(img.width * scale));
+                    canvas.height = Math.max(1, Math.floor(img.height * scale));
+
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    const coverage = analyzeCanvasPixels(canvas);
+
+                    state.hasFile = true;
+                    state.fileName = file.name;
+                    state.cmyCoverage = Number(coverage.cmy.toFixed(2));
+                    state.blackCoverage = Number(coverage.black.toFixed(2));
+                    inputPages.value = 1;
+
+                    previewThumb.src = dataUrl;
+                    previewThumb.classList.remove('hidden');
+                    previewPdfIcon.classList.add('hidden');
+                    fileNameEl.textContent = file.name;
+                    fileMetaEl.textContent = `Gambar (${img.width}×${img.height}px) • 1 halaman`;
+
+                } else if (isPdf) {
+                    analyzingText.textContent = 'Membaca halaman PDF...';
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    const numPages = pdf.numPages;
+
+                    const pagesToAnalyze = Math.min(numPages, 10);
+                    let sumCmy = 0;
+                    let sumBlack = 0;
+                    let thumbDataUrl = '';
+
+                    for (let pageNum = 1; pageNum <= pagesToAnalyze; pageNum++) {
+                        analyzingText.textContent = `Menganalisis tinta halaman ${pageNum} dari ${pagesToAnalyze}...`;
+                        const page = await pdf.getPage(pageNum);
+                        const viewport = page.getViewport({ scale: 0.6 });
+
+                        canvas.width = Math.max(1, Math.floor(viewport.width));
+                        canvas.height = Math.max(1, Math.floor(viewport.height));
+
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+                        if (pageNum === 1) {
+                            thumbDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+                        }
+
+                        const pageCov = analyzeCanvasPixels(canvas);
+                        sumCmy += pageCov.cmy;
+                        sumBlack += pageCov.black;
+                    }
+
+                    state.hasFile = true;
+                    state.fileName = file.name;
+                    state.cmyCoverage = Number((sumCmy / pagesToAnalyze).toFixed(2));
+                    state.blackCoverage = Number((sumBlack / pagesToAnalyze).toFixed(2));
+                    inputPages.value = numPages;
+
+                    if (thumbDataUrl) {
+                        previewThumb.src = thumbDataUrl;
+                        previewThumb.classList.remove('hidden');
+                        previewPdfIcon.classList.add('hidden');
+                    } else {
+                        previewThumb.classList.add('hidden');
+                        previewPdfIcon.classList.remove('hidden');
+                    }
+                    fileNameEl.textContent = file.name;
+                    fileMetaEl.textContent = `Dokumen PDF • Terdeteksi ${numPages} halaman`;
+                }
+
+                badgeCmyCov.textContent = state.cmyCoverage.toFixed(1) + '%';
+                badgeBlackCov.textContent = state.blackCoverage.toFixed(1) + '%';
+
+                uploadAnalyzing.classList.add('hidden');
+                uploadAnalyzing.classList.remove('flex');
+                uploadPreview.classList.remove('hidden');
+                defaultCoverageNote.classList.add('hidden');
+
+                performCalculation();
+                showToast('Analisis tinta berhasil!');
+
+            } catch (err) {
+                console.error('Error analyzing file:', err);
+                resetUploadedFile();
+                showToast('Gagal memproses file. Pastikan file tidak rusak atau terkunci.');
+            }
+        }
+
+        function resetUploadedFile(e) {
+            if (e) e.stopPropagation();
+            fileInput.value = '';
+            state.hasFile = false;
+            state.fileName = '';
+            state.cmyCoverage = 5.0;
+            state.blackCoverage = 5.0;
+            inputPages.value = 1;
+
+            uploadPreview.classList.add('hidden');
+            uploadAnalyzing.classList.add('hidden');
+            uploadPlaceholder.classList.remove('hidden');
+            defaultCoverageNote.classList.remove('hidden');
+
+            performCalculation();
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        dropZone.addEventListener('click', (e) => {
+            if (e.target.closest('#btnRemoveFile')) return;
+            fileInput.click();
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-[#141414]', 'bg-slate-100/70');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-[#141414]', 'bg-slate-100/70');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-[#141414]', 'bg-slate-100/70');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                processUploadedFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                processUploadedFile(e.target.files[0]);
+            }
+        });
+
+        btnRemoveFile.addEventListener('click', resetUploadedFile);
+
+        // Printer Radio Card Selection
+        printerCards.forEach(card => {
+            card.addEventListener('click', () => {
+                printerCards.forEach(c => {
+                    c.classList.remove('active', 'border-[#141414]');
+                    c.classList.add('border-slate-200', 'hover:border-slate-300');
+                    const icon = c.querySelector('.check-icon');
+                    icon.classList.remove('bg-[#141414]');
+                    icon.classList.add('bg-slate-200');
+                    const sub = c.querySelector('p:nth-of-type(1)');
+                    if (sub) {
+                        sub.classList.remove('text-slate-500');
+                        sub.classList.add('text-slate-400');
+                    }
+                });
+
+                card.classList.add('active', 'border-[#141414]');
+                card.classList.remove('border-slate-200', 'hover:border-slate-300');
+                const activeIcon = card.querySelector('.check-icon');
+                activeIcon.classList.remove('bg-slate-200');
+                activeIcon.classList.add('bg-[#141414]');
+                const activeSub = card.querySelector('p:nth-of-type(1)');
+                if (activeSub) {
+                    activeSub.classList.remove('text-slate-400');
+                    activeSub.classList.add('text-slate-500');
+                }
+
+                const printerKey = card.dataset.printer;
+                state.printer = printerKey;
+
+                const preset = printerPresets[printerKey];
+                if (preset) {
+                    cmyPriceInput.value = preset.cmyPrice;
+                    cmyVolumeInput.value = preset.cmyVolume;
+                    blackPriceInput.value = preset.blackPrice;
+                    blackVolumeInput.value = preset.blackVolume;
+                }
+
+                performCalculation();
+            });
+        });
+
+        // Reset Ink Default Button
+        btnResetInk.addEventListener('click', () => {
+            const preset = printerPresets[state.printer] || printerPresets['canon-g1010'];
+            cmyPriceInput.value = preset.cmyPrice;
+            cmyVolumeInput.value = preset.cmyVolume;
+            blackPriceInput.value = preset.blackPrice;
+            blackVolumeInput.value = preset.blackVolume;
+            performCalculation();
+            showToast('Modal tinta dikembalikan ke default ' + preset.name);
+        });
+
+        // Paper Cost Toggle & Preset
+        togglePaperCost.addEventListener('change', () => {
+            if (togglePaperCost.checked) {
+                paperCostForm.classList.remove('hidden');
+                paperCostSummaryBadge.classList.remove('hidden');
+            } else {
+                paperCostForm.classList.add('hidden');
+                paperCostSummaryBadge.classList.add('hidden');
+            }
+            performCalculation();
+        });
+
+        selectPaperType.addEventListener('change', () => {
+            const selectedOpt = selectPaperType.options[selectPaperType.selectedIndex];
+            paperPackPrice.value = selectedOpt.dataset.price || 55000;
+            paperPackQty.value = selectedOpt.dataset.qty || 500;
+            performCalculation();
+        });
+
+        // Listen to all inputs for real-time calculation updates
+        const allInputs = [
+            inputPages, inputCopies,
+            selectPaperSize, selectQuality, selectDuplex, selectBorder,
+            cmyPriceInput, cmyVolumeInput, blackPriceInput, blackVolumeInput,
+            paperPackPrice, paperPackQty,
+            inputMarkup, inputServiceFee
+        ];
+
+        allInputs.forEach(el => {
+            el.addEventListener('input', performCalculation);
+            el.addEventListener('change', performCalculation);
+        });
+
+        // ==================== CORE CALCULATION ENGINE ====================
+        function performCalculation() {
+            const pages = Math.max(1, parseInt(inputPages.value) || 1);
+            const copies = Math.max(1, parseInt(inputCopies.value) || 1);
+            const totalPrintedPages = pages * copies;
+
+            const paperSize = selectPaperSize.value;
+            const quality = selectQuality.value;
+            const duplex = selectDuplex.value;
+            const border = selectBorder.value;
+
+            const areaFactor = paperAreaMultipliers[paperSize] || 1.0;
+            const qualityFactor = qualityMultipliers[quality] || 1.0;
+            const borderFactor = border === 'borderless' ? 1.12 : 1.0;
+
+            const BASE_ML_AT_100_PCT_A4 = 0.30;
+
+            const cmyMlPerPage = (state.cmyCoverage / 100) * BASE_ML_AT_100_PCT_A4 * areaFactor * qualityFactor * borderFactor;
+            const blackMlPerPage = (state.blackCoverage / 100) * BASE_ML_AT_100_PCT_A4 * areaFactor * qualityFactor * borderFactor;
+
+            const totalCmyMl = cmyMlPerPage * totalPrintedPages;
+            const totalBlackMl = blackMlPerPage * totalPrintedPages;
+
+            const cmyPrice = Math.max(0, parseFloat(cmyPriceInput.value) || 0);
+            const cmyVol = Math.max(1, parseFloat(cmyVolumeInput.value) || 70);
+            const costPerMlCmy = cmyPrice / cmyVol;
+
+            const blackPrice = Math.max(0, parseFloat(blackPriceInput.value) || 0);
+            const blackVol = Math.max(1, parseFloat(blackVolumeInput.value) || 135);
+            const costPerMlBlack = blackPrice / blackVol;
+
+            const totalCmyCost = totalCmyMl * costPerMlCmy;
+            const totalBlackCost = totalBlackMl * costPerMlBlack;
+
+            let totalPaperCost = 0;
+            let physicalSheets = 0;
+            let costPerSheet = 0;
+
+            if (togglePaperCost.checked) {
+                const packPrice = Math.max(0, parseFloat(paperPackPrice.value) || 0);
+                const packQty = Math.max(1, parseFloat(paperPackQty.value) || 500);
+                costPerSheet = packPrice / packQty;
+
+                paperCostSummaryBadge.textContent = `${formatRupiah(costPerSheet)} / lbr`;
+
+                const sheetsPerCopy = duplex === 'duplex' ? Math.ceil(pages / 2) : pages;
+                physicalSheets = sheetsPerCopy * copies;
+                totalPaperCost = physicalSheets * costPerSheet;
+            }
+
+            const totalHpp = totalCmyCost + totalBlackCost + totalPaperCost;
+
+            const markupPct = Math.max(0, parseFloat(inputMarkup.value) || 0);
+            const serviceFee = Math.max(0, parseFloat(inputServiceFee.value) || 0);
+
+            const profitAmount = totalHpp * (markupPct / 100);
+            const grandTotal = totalHpp + profitAmount + serviceFee;
+            const pricePerPage = grandTotal / totalPrintedPages;
+
+            liveTotalDisplay.textContent = formatRupiah(grandTotal);
+
+            state.lastCalculation = {
+                printerName: printerPresets[state.printer]?.name || 'Canon G1010',
+                paperSize,
+                qualityText: selectQuality.options[selectQuality.selectedIndex].text.split(' (')[0],
+                duplexText: duplex === 'duplex' ? '2 Sisi (Bolak-Balik)' : '1 Sisi',
+                pages,
+                copies,
+                totalPrintedPages,
+                cmyCoverage: state.cmyCoverage,
+                blackCoverage: state.blackCoverage,
+                totalCmyMl,
+                totalBlackMl,
+                totalCmyCost,
+                totalBlackCost,
+                includePaper: togglePaperCost.checked,
+                physicalSheets,
+                totalPaperCost,
+                totalHpp,
+                markupPct,
+                profitAmount,
+                serviceFee,
+                grandTotal,
+                pricePerPage
+            };
+
+            return state.lastCalculation;
+        }
+
+        // ==================== MODAL ACTIONS ====================
+        function calculateAndShowModal() {
+            const res = performCalculation();
+
+            document.getElementById('modalSubtitle').textContent = 
+                `${res.printerName} • ${res.paperSize} • ${res.qualityText} • ${res.duplexText}`;
+
+            document.getElementById('modalSourceTag').textContent = 
+                state.hasFile ? `File: ${state.fileName.slice(0, 20)}${state.fileName.length > 20 ? '...' : ''}` : 'Estimasi Standar';
+
+            document.getElementById('resCmyCov').textContent = res.cmyCoverage.toFixed(1) + '%';
+            document.getElementById('resCmyMl').textContent = res.totalCmyMl.toFixed(3);
+            document.getElementById('resBlackCov').textContent = res.blackCoverage.toFixed(1) + '%';
+            document.getElementById('resBlackMl').textContent = res.totalBlackMl.toFixed(3);
+
+            document.getElementById('resCostCmy').textContent = formatRupiah(res.totalCmyCost);
+            document.getElementById('resCostBlack').textContent = formatRupiah(res.totalBlackCost);
+
+            const resPaperRow = document.getElementById('resPaperRow');
+            if (res.includePaper) {
+                resPaperRow.classList.remove('hidden');
+                document.getElementById('resPaperLabel').textContent = `Biaya Kertas (${res.physicalSheets} lembar)`;
+                document.getElementById('resCostPaper').textContent = formatRupiah(res.totalPaperCost);
+            } else {
+                resPaperRow.classList.add('hidden');
+            }
+
+            document.getElementById('resTotalHpp').textContent = formatRupiah(res.totalHpp);
+            document.getElementById('resMarkupPct').textContent = res.markupPct;
+            document.getElementById('resProfitAmount').textContent = '+ ' + formatRupiah(res.profitAmount);
+            document.getElementById('resServiceFee').textContent = formatRupiah(res.serviceFee);
+
+            document.getElementById('resTotalPages').textContent = res.totalPrintedPages;
+            document.getElementById('resGrandTotal').textContent = formatRupiah(res.grandTotal);
+            document.getElementById('resPricePerPage').textContent = `${formatRupiah(res.pricePerPage)} / hal`;
+
+            const modal = document.getElementById('resultModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('resultModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.getElementById('resultModal').addEventListener('click', (e) => {
+            if (e.target.id === 'resultModal') {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Initial calculation on load
+        performCalculation();
+    </script>
+</body>
+</html>
