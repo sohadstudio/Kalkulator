@@ -9,9 +9,10 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts: Plus Jakarta Sans -->
+    <!-- Google Fonts: Plus Jakarta Sans (Wajib dimuat via <link> agar langsung aktif) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
     
     <!-- Font Awesome 6 Free -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -50,21 +51,25 @@
         html, body, .post-body {
             background-color: #f4f4f4 !important;
         }
-      
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
-        *:not(.fa-solid):not(.fa-regular):not(.fa-brands):not(.fas):not(.far):not(.fab):not([class*="fa-"]),
-        body, button, input, select, textarea, table, th, td {
-            font-family: 'Plus Jakarta Sans', sans-serif !important;
+        /* Paksa seluruh elemen teks (kecuali ikon Font Awesome) memakai Plus Jakarta Sans */
+        html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, strong, b, i, em, label,
+        button, input, select, option, textarea, table, th, td,
+        *:not(.fa):not(.fa-solid):not(.fa-regular):not(.fa-brands):not(.fas):not(.far):not(.fab):not([class*="fa-"]) {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
         }
 
         /* Crisp & aligned Font Awesome rendering */
         .fa-solid, .fa-regular, .fa-brands {
+            font-family: "Font Awesome 6 Free" !important;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             line-height: 1;
             vertical-align: middle;
+        }
+        .fa-brands {
+            font-family: "Font Awesome 6 Brands" !important;
         }
 
         body {
@@ -118,7 +123,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col font-sans">
 
     <!-- Hidden Canvas for Pixel & Ink Analysis -->
     <canvas id="analysisCanvas" class="hidden"></canvas>
@@ -482,12 +487,12 @@
                 </section>
 
                 <!-- LIVE QUICK PREVIEW BAR (Tampilan statis di tengah) -->
-<div class="bg-[#141414] text-white rounded-2xl p-4 sm:px-6 flex items-center justify-center text-center shadow-sm">
-    <div>
-        <p class="text-[11px] font-medium text-neutral-400">Estimasi Total Harga Jual</p>
-        <p id="liveTotalDisplay" class="text-2xl sm:text-3xl font-black tracking-tight mt-0.5">Rp 150</p>
-    </div>
-</div>
+                <div class="bg-[#141414] text-white rounded-2xl p-4 sm:px-6 flex items-center justify-center text-center shadow-sm">
+                    <div>
+                        <p class="text-[11px] font-medium text-neutral-400">Estimasi Total Harga Jual</p>
+                        <p id="liveTotalDisplay" class="text-2xl sm:text-3xl font-black tracking-tight mt-0.5">Rp 150</p>
+                    </div>
+                </div>
 
             </div>
         </div>
